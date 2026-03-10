@@ -1,0 +1,29 @@
+{{ define "partials/breadcrumb.html" }}
+<nav class="flex mb-6" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        {{ range $index, $crumb := . }}
+            {{ if gt $index 0 }}
+            <li>
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-base-content/40" aria-hidden="true">
+                        <use href="#hi-chevron-right"></use>
+                    </svg>
+                </div>
+            </li>
+            {{ end }}
+
+            {{ if $crumb.url }}
+            <li class="inline-flex items-center">
+                <a href="{{ $crumb.url }}" class="inline-flex items-center text-sm font-medium text-base-content/70 hover:text-base-content">
+                    {{ $crumb.label }}
+                </a>
+            </li>
+            {{ else }}
+            <li>
+                <span class="ml-1 text-sm font-medium text-base-content/60 md:ml-2">{{ $crumb.label }}</span>
+            </li>
+            {{ end }}
+        {{ end }}
+    </ol>
+</nav>
+{{ end }}

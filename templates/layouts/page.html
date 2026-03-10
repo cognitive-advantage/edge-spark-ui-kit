@@ -3,21 +3,44 @@
 {{ end }}
 
 {{ define "main" }}
-<section class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-    {{ if .Breadcrumbs }}
-        {{ template "partials/breadcrumbs.html" . }}
-    {{ end }}
+<section class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+        {{ if .breadcrumbs }}
+            {{ template "partials/breadcrumb.html" .breadcrumbs }}
+        {{ end }}
 
-    {{ if .Flash }}
-        {{ template "components/flash.html" .Flash }}
-    {{ end }}
+        <div class="card bg-base-100 shadow-sm border border-base-300 rounded-lg">
+            <div class="px-4 py-3 border-b border-base-300 bg-base-200 rounded-t-lg">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-base font-semibold text-base-content">{{ if .title }}{{ .title }}{{ else }}Details{{ end }}</h2>
+                    <div class="flex items-center gap-2">
+                        {{ if .titleStatus }}
+                            <span class="badge badge-sm {{ if .titleStatusClass }}{{ .titleStatusClass }}{{ else }}badge-ghost{{ end }}">{{ .titleStatus }}</span>
+                        {{ end }}
+                    {{ if .toolbarEndSlots }}
+                        <div class="flex items-center gap-1">
+                            {{ range .toolbarEndSlots }}
+                                {{ render .Template .Data }}
+                            {{ end }}
+                        </div>
+                    {{ end }}
+                    </div>
+                </div>
+            </div>
 
-    {{ if .ContentTemplate }}
-        {{ template .ContentTemplate . }}
-    {{ else }}
-        <div class="rounded-md border border-red-300 bg-red-50 p-4 text-sm text-red-700">
-            content template missing
+            <div class="px-4 py-5">
+                {{ if .contentTemplate }}
+                    {{ render .contentTemplate . }}
+                {{ else }}
+                    <div class="alert alert-error">
+                        <svg class="h-5 w-5" aria-hidden="true">
+                            <use href="#hi-exclamation-triangle"></use>
+                        </svg>
+                        <div class="text-sm">Content template missing</div>
+                    </div>
+                {{ end }}
+            </div>
         </div>
-    {{ end }}
+    </div>
 </section>
 {{ end }}

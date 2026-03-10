@@ -1,7 +1,9 @@
 {{ define "partials/footer.html" }}
-<footer class="border-t border-grey-200 bg-white">
-    <div class="mx-auto w-full max-w-6xl px-4 py-5 text-sm text-grey-600 sm:px-6 lg:px-8">
-        {{ if .FooterText }}{{ .FooterText }}{{ else }}Edge Spark{{ end }}
+<footer class="bg-base-100 border-t border-base-300">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <p class="text-center text-sm text-base-content/60">
+            &copy; {{ if .year }}{{ .year }}{{ else }}2026{{ end }} {{ if .appName }}{{ .appName }}{{ else if .AppName }}{{ .AppName }}{{ else }}Edge Spark{{ end }}. All rights reserved.
+        </p>
     </div>
 </footer>
 {{ end }}

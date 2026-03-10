@@ -1,0 +1,76 @@
+{{ define "partials/navbar.html" }}
+<nav class="bg-base-100 border-b border-base-300">
+    <div class="navbar min-h-16 w-full px-4 sm:px-6 lg:px-8">
+        <div class="navbar-start gap-2">
+            <a href="/" class="flex-shrink-0 flex items-center" aria-label="Go to home">
+                <img id="brand-logo" class="h-6 w-auto" src="/ui-kit/img/logo-light.png" alt="Edge Spark Logo">
+                <h1 class="ml-3 text-xl font-bold text-base-content">{{ if .appName }}{{ .appName }}{{ else if .AppName }}{{ .AppName }}{{ else }}Edge Spark{{ end }}</h1>
+            </a>
+            {{ if .navbarStartSlots }}
+            <div class="hidden lg:flex items-center gap-2 ml-3">
+                {{ range .navbarStartSlots }}
+                    {{ render .Template .Data }}
+                {{ end }}
+            </div>
+            {{ end }}
+        </div>
+        <div class="navbar-end">
+            <div class="flex items-center gap-2">
+                {{ if .navItems }}
+                <ul class="menu menu-horizontal px-1 mr-1">
+                    {{ range .navItems }}
+                    <li><a href="{{ .Path }}">{{ .Label }}</a></li>
+                    {{ end }}
+                </ul>
+                {{ end }}
+                {{ if .navbarEndSlots }}
+                <div class="flex items-center gap-1">
+                    {{ range .navbarEndSlots }}
+                        {{ render .Template .Data }}
+                    {{ end }}
+                </div>
+                {{ end }}
+                <button id="theme-toggle" type="button" class="btn btn-ghost btn-circle" aria-label="Toggle theme" title="Toggle theme">
+                    <svg id="theme-icon-sun" class="h-5 w-5" aria-hidden="true">
+                        <use href="#hi-sun"></use>
+                    </svg>
+                    <svg id="theme-icon-moon" class="hidden h-5 w-5" aria-hidden="true">
+                        <use href="#hi-moon"></use>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+<script>
+    (function() {
+        var root = document.documentElement;
+        var button = document.getElementById("theme-toggle");
+        var logo = document.getElementById("brand-logo");
+        var sun = document.getElementById("theme-icon-sun");
+        var moon = document.getElementById("theme-icon-moon");
+        if (!button || !sun || !moon || !logo) return;
+
+        function syncThemeVisuals(theme) {
+            if (theme === "dark") {
+                sun.classList.add("hidden");
+                moon.classList.remove("hidden");
+                logo.src = "/ui-kit/img/logo-dark.png";
+            } else {
+                moon.classList.add("hidden");
+                sun.classList.remove("hidden");
+                logo.src = "/ui-kit/img/logo-light.png";
+            }
+        }
+
+        syncThemeVisuals(root.getAttribute("data-theme") || "light");
+
+        button.addEventListener("click", function() {
+            if (window.uiKitTheme && typeof window.uiKitTheme.toggle === "function") {
+                window.uiKitTheme.toggle();
+            }
+            syncThemeVisuals(root.getAttribute("data-theme") || "light");
+        });
+    })();
+</script>
+{{ end }}
