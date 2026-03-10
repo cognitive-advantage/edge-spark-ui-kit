@@ -18,23 +18,52 @@ type Engine struct {
 	templateFS   fs.FS
 	funcMap      template.FuncMap
 	cacheEnabled bool
+	options      Options
 
 	cache map[string]*template.Template
 	mu    sync.RWMutex
 }
 
+// Options controls how the renderer discovers and executes templates.
+type Options struct {
+	BaseTemplate      string
+	SupportPrefixes   []string
+	IncludeDirs       []string
+	DomainSupportDirs []string
+}
+
 // NewEngine creates a shared UI renderer.
 func NewEngine(templateFS fs.FS, funcMap template.FuncMap, cacheEnabled bool) *Engine {
+	return NewEngineWithOptions(templateFS, funcMap, cacheEnabled, DefaultOptions())
+}
+
+// NewEngineWithOptions creates a shared UI renderer with custom conventions.
+func NewEngineWithOptions(templateFS fs.FS, funcMap template.FuncMap, cacheEnabled bool, options Options) *Engine {
 	copiedFuncMap := template.FuncMap{}
 	for key, fn := range funcMap {
 		copiedFuncMap[key] = fn
+	}
+
+	if options.BaseTemplate == "" {
+		options = DefaultOptions()
 	}
 
 	return &Engine{
 		templateFS:   templateFS,
 		funcMap:      copiedFuncMap,
 		cacheEnabled: cacheEnabled,
+		options:      options,
 		cache:        make(map[string]*template.Template),
+	}
+}
+
+// DefaultOptions returns the default template conventions used by the shared ui-kit templates.
+func DefaultOptions() Options {
+	return Options{
+		BaseTemplate:      "layouts/baseof.html",
+		SupportPrefixes:   []string{"partials/", "components/"},
+		IncludeDirs:       []string{"partials", "components", "layouts"},
+		DomainSupportDirs: nil,
 	}
 }
 
@@ -61,11 +90,11 @@ func (i *instance) Render(w http.ResponseWriter) error {
 		return err
 	}
 
-	if isSupportTemplate(i.name) {
+	if i.engine.isSupportTemplate(i.name) {
 		return tmpl.ExecuteTemplate(w, i.name, i.data)
 	}
 
-	return tmpl.ExecuteTemplate(w, "layouts/baseof.html", i.data)
+	return tmpl.ExecuteTemplate(w, i.engine.options.BaseTemplate, i.data)
 }
 
 func (i *instance) WriteContentType(w http.ResponseWriter) {
@@ -115,26 +144,27 @@ func (e *Engine) collectFiles(name string) ([]string, error) {
 
 	files := []string{normalized}
 
-	if !isSupportTemplate(normalized) {
-		if _, err := fs.Stat(e.templateFS, "layouts/baseof.html"); err == nil {
-			files = append(files, "layouts/baseof.html")
+	if !e.isSupportTemplate(normalized) {
+		if _, err := fs.Stat(e.templateFS, e.options.BaseTemplate); err == nil {
+			files = append(files, e.options.BaseTemplate)
 		}
 	}
 
-	partials, err := walkHTMLFiles(e.templateFS, "partials")
-	if err == nil {
-		files = append(files, partials...)
-	}
+	for _, includeDir := range e.options.IncludeDirs {
+		if e.isSupportTemplate(normalized) && includeDir == path.Dir(e.options.BaseTemplate) {
+			continue
+		}
 
-	components, err := walkHTMLFiles(e.templateFS, "components")
-	if err == nil {
-		files = append(files, components...)
-	}
-
-	if !isSupportTemplate(normalized) {
-		layouts, err := walkHTMLFiles(e.templateFS, "layouts")
+		foundFiles, err := walkHTMLFiles(e.templateFS, includeDir)
 		if err == nil {
-			files = append(files, layouts...)
+			files = append(files, foundFiles...)
+		}
+	}
+
+	for _, domainDir := range e.options.DomainSupportDirs {
+		domainFiles, err := walkDomainSupportFiles(e.templateFS, domainDir)
+		if err == nil {
+			files = append(files, domainFiles...)
 		}
 	}
 
@@ -163,6 +193,32 @@ func walkHTMLFiles(fsys fs.FS, root string) ([]string, error) {
 	return files, nil
 }
 
+func walkDomainSupportFiles(fsys fs.FS, root string) ([]string, error) {
+	var files []string
+
+	err := fs.WalkDir(fsys, root, func(current string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if d.IsDir() || !strings.HasSuffix(d.Name(), ".html") {
+			return nil
+		}
+
+		baseName := path.Base(current)
+		if baseName == "row_template.html" || strings.HasPrefix(baseName, "_") {
+			files = append(files, current)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
+}
+
 func dedupe(items []string) []string {
 	seen := make(map[string]struct{}, len(items))
 	result := make([]string, 0, len(items))
@@ -176,6 +232,12 @@ func dedupe(items []string) []string {
 	return result
 }
 
-func isSupportTemplate(name string) bool {
-	return strings.HasPrefix(name, "partials/") || strings.HasPrefix(name, "components/")
+func (e *Engine) isSupportTemplate(name string) bool {
+	for _, prefix := range e.options.SupportPrefixes {
+		if strings.HasPrefix(name, prefix) {
+			return true
+		}
+	}
+
+	return false
 }

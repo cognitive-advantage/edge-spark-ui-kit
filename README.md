@@ -14,8 +14,24 @@ Shared UI composition layer for Edge Spark Go web apps.
 ## Included
 
 - Embedded templates under `templates/`
+- Embedded theme assets under `assets/`
 - Gin-compatible HTML renderer in `renderer/`
 - Shared baseline view models in `viewmodel/`
+
+## Serving Ui-Kit Assets
+
+Mount assets once in your Gin server:
+
+```go
+r.StaticFS("/ui-kit", uikit.AssetsHTTPFS())
+```
+
+This exposes:
+
+- `/ui-kit/css/uikit.css`
+- `/ui-kit/js/theme.js`
+
+The shared `layouts/baseof.html` already includes those files before app CSS.
 
 ## Quick Start
 
