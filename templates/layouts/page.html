@@ -1,0 +1,23 @@
+{{ define "layouts/page.html" }}
+{{ template "layouts/baseof.html" . }}
+{{ end }}
+
+{{ define "main" }}
+<section class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+    {{ if .Breadcrumbs }}
+        {{ template "partials/breadcrumbs.html" . }}
+    {{ end }}
+
+    {{ if .Flash }}
+        {{ template "components/flash.html" .Flash }}
+    {{ end }}
+
+    {{ if .ContentTemplate }}
+        {{ template .ContentTemplate . }}
+    {{ else }}
+        <div class="rounded-md border border-red-300 bg-red-50 p-4 text-sm text-red-700">
+            content template missing
+        </div>
+    {{ end }}
+</section>
+{{ end }}

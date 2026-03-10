@@ -1,0 +1,24 @@
+{{ define "layouts/baseof.html" }}
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ if .Title }}{{ .Title }} - {{ end }}{{ if .AppName }}{{ .AppName }}{{ else }}Edge Spark{{ end }}</title>
+    <link rel="stylesheet" href="/static/css/output.css">
+</head>
+<body class="h-full bg-white text-grey-900">
+    {{ block "header" . }}
+        {{ template "partials/header.html" . }}
+    {{ end }}
+
+    <main class="min-h-[calc(100vh-8rem)]">
+        {{ block "main" . }}{{ end }}
+    </main>
+
+    {{ block "footer" . }}
+        {{ template "partials/footer.html" . }}
+    {{ end }}
+</body>
+</html>
+{{ end }}

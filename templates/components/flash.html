@@ -1,0 +1,12 @@
+{{ define "components/flash.html" }}
+{{ $kind := .Kind }}
+{{ if eq $kind "success" }}
+<div class="mb-4 rounded-md border border-lime-300 bg-lime-50 p-3 text-sm text-lime-800">{{ .Message }}</div>
+{{ else if eq $kind "warning" }}
+<div class="mb-4 rounded-md border border-salmon-300 bg-salmon-50 p-3 text-sm text-salmon-800">{{ .Message }}</div>
+{{ else if eq $kind "error" }}
+<div class="mb-4 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">{{ .Message }}</div>
+{{ else }}
+<div class="mb-4 rounded-md border border-grey-300 bg-grey-50 p-3 text-sm text-grey-800">{{ .Message }}</div>
+{{ end }}
+{{ end }}

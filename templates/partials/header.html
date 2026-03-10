@@ -1,0 +1,14 @@
+{{ define "partials/header.html" }}
+<header class="border-b border-grey-200 bg-white">
+    <div class="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <a href="/" class="text-base font-semibold text-grey-900">{{ if .AppName }}{{ .AppName }}{{ else }}Edge Spark{{ end }}</a>
+        {{ if .NavItems }}
+            <nav aria-label="Main" class="flex items-center gap-1">
+                {{ range .NavItems }}
+                    <a href="{{ .Path }}" class="rounded-md px-3 py-2 text-sm text-grey-700 hover:bg-grey-100 hover:text-grey-900">{{ .Label }}</a>
+                {{ end }}
+            </nav>
+        {{ end }}
+    </div>
+</header>
+{{ end }}
