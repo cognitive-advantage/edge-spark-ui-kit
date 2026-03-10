@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="{{ if .stylesHref }}{{ .stylesHref }}{{ else if .StylesHref }}{{ .StylesHref }}{{ else }}/static/css/styles.css{{ end }}">
 </head>
-<body class="h-full bg-base-200 text-base-content">
+<body class="h-full bg-base-200 text-base-content" style="margin:0; min-height:100vh;">
     <svg aria-hidden="true" class="hidden" xmlns="http://www.w3.org/2000/svg">
         <symbol id="hi-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -37,12 +37,12 @@
         </symbol>
     </svg>
 
-    <div class="min-h-screen flex flex-col">
+    <div class="min-h-screen flex flex-col" style="min-height:100vh; display:flex; flex-direction:column;">
     {{ block "header" . }}
         {{ template "partials/navbar.html" . }}
     {{ end }}
 
-    <main class="flex-1">
+    <main class="flex-1" style="flex:1 1 auto;">
         {{ block "main" . }}{{ end }}
     </main>
 
