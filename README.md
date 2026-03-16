@@ -64,3 +64,11 @@ c.HTML(http.StatusOK, "layouts/page.html", gin.H{
 - Run `go test ./...` in this module.
 - Require downstream app integration tests against a pinned ui-kit version.
 - Version with semver tags and update apps intentionally.
+
+## Build
+
+Build a distributable source bundle to repository root `./bin`:
+
+```bash
+make build
+```
